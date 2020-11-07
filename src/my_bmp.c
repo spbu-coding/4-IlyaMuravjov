@@ -8,8 +8,8 @@
 #include "logging_std_wrappers.h"
 
 static const uint16_t MY_BMP_SUPPORTED_FORMAT_IDENTIFIER = 0x4D42;
-static const uint32_t MY_BMP_FILE_HEADER_SIZE = 14;
-static const uint32_t MY_BMP_SUPPORTED_INFO_HEADER_SIZE = 40;
+#define MY_BMP_FILE_HEADER_SIZE ((uint32_t) 14)
+#define MY_BMP_SUPPORTED_INFO_HEADER_SIZE ((uint32_t) 40)
 static const uint32_t MY_BMP_SUPPORTED_BMP_HEADER_SIZE = MY_BMP_FILE_HEADER_SIZE + MY_BMP_SUPPORTED_INFO_HEADER_SIZE;
 static const uint16_t MY_BMP_VALID_PLANES = 1;
 static const uint32_t MY_BMP_SUPPORTED_COMPRESSION_METHOD = 0;
