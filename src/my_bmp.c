@@ -37,9 +37,9 @@ int32_t int32_abs(int32_t x) {
     return x > 0 ? x : -x;
 }
 
-uint32_t get_my_bmp_abs_width(MY_BMP *bmp) {
+uint32_t get_my_bmp_width(MY_BMP *bmp) {
     assert(bmp != NULL);
-    return int32_abs(bmp->header.width);
+    return bmp->header.width;
 }
 
 uint32_t get_my_bmp_abs_height(MY_BMP *bmp) {
@@ -60,50 +60,50 @@ RESPONSE read_my_bmp_header(MY_BMP_HEADER *header, FILE *file) {
     byte_t *buffer_head = buffer;
     if (logging_fread(buffer, sizeof(buffer), 1, file, "bmp header") != 1)
         return file_error_to_response(file);
-    header->format_identifier = read_le_uint16_from_buffer(&buffer_head);
+    header->format_identifier = read_next_le_uint16_from_buffer(&buffer_head);
     if (header->format_identifier != MY_BMP_SUPPORTED_FORMAT_IDENTIFIER) {
         log_error("Unsupported file format. Expected 0x%"PRIX16", but found 0x%"PRIX16"\n",
                   MY_BMP_SUPPORTED_FORMAT_IDENTIFIER, header->format_identifier);
         return UNSUPPORTED_VALUE;
     }
-    header->file_size = read_le_uint32_from_buffer(&buffer_head);
+    header->file_size = read_next_le_uint32_from_buffer(&buffer_head);
     for (size_t i = 0; i < MY_BMP_RESERVED_COUNT; i++) {
-        header->reserved[i] = read_le_uint16_from_buffer(&buffer_head);
+        header->reserved[i] = read_next_le_uint16_from_buffer(&buffer_head);
         if (header->reserved[i] != 0) {
             log_error("Invalid reserved field #%zu. Expected 0, but found 0x%"PRIX16"\n", i + 1, header->reserved[i]);
             return INVALID_VALUE;
         }
     }
-    header->pixel_array_offset = read_le_uint32_from_buffer(&buffer_head);
-    header->info_header_size = read_le_uint32_from_buffer(&buffer_head);
+    header->pixel_array_offset = read_next_le_uint32_from_buffer(&buffer_head);
+    header->info_header_size = read_next_le_uint32_from_buffer(&buffer_head);
     if (header->info_header_size != MY_BMP_SUPPORTED_INFO_HEADER_SIZE) {
         log_error("Unsupported info header size. Expected 0x%"PRIX32", but found 0x%"PRIX32"\n",
                   MY_BMP_SUPPORTED_INFO_HEADER_SIZE, header->info_header_size);
         return UNSUPPORTED_VALUE;
     }
-    header->width = read_le_int32_from_buffer(&buffer_head);
-    header->height = read_le_int32_from_buffer(&buffer_head);
-    header->planes = read_le_uint16_from_buffer(&buffer_head);
+    header->width = read_next_le_int32_from_buffer(&buffer_head);
+    header->height = read_next_le_int32_from_buffer(&buffer_head);
+    header->planes = read_next_le_uint16_from_buffer(&buffer_head);
     if (header->planes != MY_BMP_VALID_PLANES) {
         log_error("Invalid number of planes. Expected %"PRIu16", but found %"PRIu16"\n", MY_BMP_VALID_PLANES, header->planes);
         return INVALID_VALUE;
     }
-    header->bits_per_pixel = read_le_uint16_from_buffer(&buffer_head);
+    header->bits_per_pixel = read_next_le_uint16_from_buffer(&buffer_head);
     if (header->bits_per_pixel != 8 && header->bits_per_pixel != 24) {
         log_error("Unsupported number of bits per pixel. Expected 8 or 24, but found %"PRIu16"\n", header->bits_per_pixel);
         return UNSUPPORTED_VALUE;
     }
-    header->compression_method = read_le_uint32_from_buffer(&buffer_head);
+    header->compression_method = read_next_le_uint32_from_buffer(&buffer_head);
     if (header->compression_method != MY_BMP_SUPPORTED_COMPRESSION_METHOD) {
         log_error("Unsupported compression method. Expected %"PRIu32", but found %"PRIu32"\n",
                   MY_BMP_SUPPORTED_COMPRESSION_METHOD, header->compression_method);
         return UNSUPPORTED_VALUE;
     }
-    header->image_size = read_le_uint32_from_buffer(&buffer_head);
-    header->horizontal_resolution = read_le_int32_from_buffer(&buffer_head);
-    header->vertical_resolution = read_le_int32_from_buffer(&buffer_head);
-    header->colors_used = read_le_uint32_from_buffer(&buffer_head);
-    header->important_colors = read_le_uint32_from_buffer(&buffer_head);
+    header->image_size = read_next_le_uint32_from_buffer(&buffer_head);
+    header->horizontal_resolution = read_next_le_int32_from_buffer(&buffer_head);
+    header->vertical_resolution = read_next_le_int32_from_buffer(&buffer_head);
+    header->colors_used = read_next_le_uint32_from_buffer(&buffer_head);
+    header->important_colors = read_next_le_uint32_from_buffer(&buffer_head);
     return SUCCESS;
 }
 
@@ -112,22 +112,22 @@ RESPONSE write_my_bmp_header(MY_BMP_HEADER *header, FILE *file) {
     assert(file != NULL);
     byte_t buffer[MY_BMP_SUPPORTED_BMP_HEADER_SIZE];
     byte_t *buffer_head = buffer;
-    write_le_uint16_to_buffer(header->format_identifier, &buffer_head);
-    write_le_uint32_to_buffer(header->file_size, &buffer_head);
+    write_next_le_uint16_to_buffer(header->format_identifier, &buffer_head);
+    write_next_le_uint32_to_buffer(header->file_size, &buffer_head);
     for (size_t i = 0; i < MY_BMP_RESERVED_COUNT; i++)
-        write_le_uint16_to_buffer(header->reserved[i], &buffer_head);
-    write_le_uint32_to_buffer(header->pixel_array_offset, &buffer_head);
-    write_le_uint32_to_buffer(header->info_header_size, &buffer_head);
-    write_le_int32_to_buffer(header->width, &buffer_head);
-    write_le_int32_to_buffer(header->height, &buffer_head);
-    write_le_uint16_to_buffer(header->planes, &buffer_head);
-    write_le_uint16_to_buffer(header->bits_per_pixel, &buffer_head);
-    write_le_uint32_to_buffer(header->compression_method, &buffer_head);
-    write_le_uint32_to_buffer(header->image_size, &buffer_head);
-    write_le_int32_to_buffer(header->horizontal_resolution, &buffer_head);
-    write_le_int32_to_buffer(header->vertical_resolution, &buffer_head);
-    write_le_uint32_to_buffer(header->colors_used, &buffer_head);
-    write_le_uint32_to_buffer(header->important_colors, &buffer_head);
+        write_next_le_uint16_to_buffer(header->reserved[i], &buffer_head);
+    write_next_le_uint32_to_buffer(header->pixel_array_offset, &buffer_head);
+    write_next_le_uint32_to_buffer(header->info_header_size, &buffer_head);
+    write_next_le_int32_to_buffer(header->width, &buffer_head);
+    write_next_le_int32_to_buffer(header->height, &buffer_head);
+    write_next_le_uint16_to_buffer(header->planes, &buffer_head);
+    write_next_le_uint16_to_buffer(header->bits_per_pixel, &buffer_head);
+    write_next_le_uint32_to_buffer(header->compression_method, &buffer_head);
+    write_next_le_uint32_to_buffer(header->image_size, &buffer_head);
+    write_next_le_int32_to_buffer(header->horizontal_resolution, &buffer_head);
+    write_next_le_int32_to_buffer(header->vertical_resolution, &buffer_head);
+    write_next_le_uint32_to_buffer(header->colors_used, &buffer_head);
+    write_next_le_uint32_to_buffer(header->important_colors, &buffer_head);
     if (logging_fwrite(buffer, sizeof(buffer), 1, file, "bmp header") != 1)
         return file_error_to_response(file);
     return SUCCESS;
@@ -210,14 +210,13 @@ bool my_bmp_has_palette(MY_BMP *bmp) {
 
 void assert_pixel_pos_in_my_bmp_bounds(MY_BMP *bmp, PIXEL_POS pixel_pos) {
     assert(bmp != NULL);
-    assert(pixel_pos.x < get_my_bmp_abs_width(bmp));
+    assert(pixel_pos.x < bmp->header.width);
     assert(pixel_pos.y < get_my_bmp_abs_height(bmp));
 }
 
 byte_t *get_my_bmp_pixel_data_ptr(MY_BMP *bmp, PIXEL_POS pixel_pos) {
     assert(bmp != NULL);
     assert_pixel_pos_in_my_bmp_bounds(bmp, pixel_pos);
-    if (bmp->header.width < 0) pixel_pos.x = get_my_bmp_abs_width(bmp) - pixel_pos.x - 1;
     if (bmp->header.height < 0) pixel_pos.y = get_my_bmp_abs_height(bmp) - pixel_pos.y - 1;
     uint16_t bytes_per_pixel = bmp->header.bits_per_pixel / 8;
     uint32_t bytes_per_row = bmp->header.image_size / get_my_bmp_abs_height(bmp);
@@ -256,7 +255,7 @@ PIXEL_POS_ITERATOR get_my_bmp_pixel_pos_iterator(MY_BMP *bmp) {
     assert(bmp != NULL);
     return (PIXEL_POS_ITERATOR) {
             {0, 0},
-            get_my_bmp_abs_width(bmp),
+            bmp->header.width,
             get_my_bmp_abs_height(bmp)
     };
 }
