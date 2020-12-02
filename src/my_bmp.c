@@ -37,9 +37,9 @@ int32_t int32_abs(int32_t x) {
     return x > 0 ? x : -x;
 }
 
-uint32_t get_my_bmp_abs_width(MY_BMP *bmp) {
+uint32_t get_my_bmp_width(MY_BMP *bmp) {
     assert(bmp != NULL);
-    return int32_abs(bmp->header.width);
+    return bmp->header.width;
 }
 
 uint32_t get_my_bmp_abs_height(MY_BMP *bmp) {
@@ -210,14 +210,13 @@ bool my_bmp_has_palette(MY_BMP *bmp) {
 
 void assert_pixel_pos_in_my_bmp_bounds(MY_BMP *bmp, PIXEL_POS pixel_pos) {
     assert(bmp != NULL);
-    assert(pixel_pos.x < get_my_bmp_abs_width(bmp));
+    assert(pixel_pos.x < bmp->header.width);
     assert(pixel_pos.y < get_my_bmp_abs_height(bmp));
 }
 
 byte_t *get_my_bmp_pixel_data_ptr(MY_BMP *bmp, PIXEL_POS pixel_pos) {
     assert(bmp != NULL);
     assert_pixel_pos_in_my_bmp_bounds(bmp, pixel_pos);
-    if (bmp->header.width < 0) pixel_pos.x = get_my_bmp_abs_width(bmp) - pixel_pos.x - 1;
     if (bmp->header.height < 0) pixel_pos.y = get_my_bmp_abs_height(bmp) - pixel_pos.y - 1;
     uint16_t bytes_per_pixel = bmp->header.bits_per_pixel / 8;
     uint32_t bytes_per_row = bmp->header.image_size / get_my_bmp_abs_height(bmp);
@@ -256,7 +255,7 @@ PIXEL_POS_ITERATOR get_my_bmp_pixel_pos_iterator(MY_BMP *bmp) {
     assert(bmp != NULL);
     return (PIXEL_POS_ITERATOR) {
             {0, 0},
-            get_my_bmp_abs_width(bmp),
+            bmp->header.width,
             get_my_bmp_abs_height(bmp)
     };
 }

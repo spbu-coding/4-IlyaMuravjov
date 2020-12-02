@@ -50,7 +50,7 @@ typedef struct {
 } PIXEL_POS_ITERATOR;
 
 uint32_t get_my_bmp_colors_in_palette(MY_BMP *bmp);
-uint32_t get_my_bmp_abs_width(MY_BMP *bmp);
+uint32_t get_my_bmp_width(MY_BMP *bmp);
 uint32_t get_my_bmp_abs_height(MY_BMP *bmp);
 bool my_bmp_has_palette(MY_BMP *bmp);
 

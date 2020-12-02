@@ -18,7 +18,7 @@ int compare_my_bmp(MY_BMP *bmp1, MY_BMP *bmp2, PIXEL_POS difference_arr[], size_
     assert(bmp1 != NULL);
     assert(bmp2 != NULL);
     assert(difference_arr != NULL);
-    if (get_my_bmp_abs_width(bmp1) != get_my_bmp_abs_width(bmp2) || get_my_bmp_abs_height(bmp1) != get_my_bmp_abs_height(bmp2)) {
+    if (get_my_bmp_width(bmp1) != get_my_bmp_width(bmp2) || get_my_bmp_abs_height(bmp1) != get_my_bmp_abs_height(bmp2)) {
         log_error("Unable to compare images with different dimensions\n");
         return COMPARER_INCOMPARABLE_IMAGES_EXIT_CODE;
     }
