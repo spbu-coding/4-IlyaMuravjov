@@ -11,11 +11,11 @@ static const int CONVERTER_INVALID_FILE_STRUCTURE_EXIT_CODE = -2;
 static const int CONVERTER_QDBMP_ERROR_EXIT_CODE = -3;
 static const int CONVERTER_INVALID_COMMAND_LINE_ARGS_EXIT_CODE = -4;
 
-static const int CONVERTER_IMPLEMENTATION_TYPE_ARG_INDEX = 0;
-static const int CONVERTER_INPUT_FILE_ARG_INDEX = 1;
-static const int CONVERTER_OUTPUT_FILE_ARG_INDEX = 2;
+static const int CONVERTER_IMPLEMENTATION_TYPE_ARG_INDEX = 1;
+static const int CONVERTER_INPUT_FILE_ARG_INDEX = 2;
+static const int CONVERTER_OUTPUT_FILE_ARG_INDEX = 3;
 
-static const int CONVERTER_REQUIRED_ARG_COUNT = 3;
+static const int CONVERTER_REQUIRED_ARG_COUNT = 1 + 3;
 
 void invert_color(COLOR *color) {
     assert(color != NULL);
@@ -72,9 +72,8 @@ void invert_qdbmp(BMP *bmp) {
 }
 
 int main(int argc, char *argv[]) {
-    argc--, argv++; // ignore the name of the program
     if (argc != CONVERTER_REQUIRED_ARG_COUNT) {
-        log_error("Invalid number of command line arguments. Expected %d arg(s), but found %d arg(s)\n", CONVERTER_REQUIRED_ARG_COUNT, argc);
+        log_error("Invalid number of command line arguments. Expected %d arg(s), but found %d arg(s)\n", CONVERTER_REQUIRED_ARG_COUNT - 1, argc - 1);
         return CONVERTER_INVALID_COMMAND_LINE_ARGS_EXIT_CODE;
     }
     if (strcmp(argv[CONVERTER_IMPLEMENTATION_TYPE_ARG_INDEX], "--mine") == 0) {

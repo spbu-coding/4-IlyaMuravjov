@@ -9,10 +9,10 @@ static const int COMPARER_INVALID_COMMAND_LINE_ARGS_EXIT_CODE = -4;
 
 static const int DIFFERENCE_ARR_MAX_LENGTH = 100;
 
-static const int COMPARER_FIRST_FILE_ARG_INDEX = 0;
-static const int COMPARER_SECOND_FILE_ARG_INDEX = 1;
+static const int COMPARER_FIRST_FILE_ARG_INDEX = 1;
+static const int COMPARER_SECOND_FILE_ARG_INDEX = 2;
 
-static const int COMPARER_REQUIRED_ARG_COUNT = 2;
+static const int COMPARER_REQUIRED_ARG_COUNT = 1 + 2;
 
 int compare_my_bmp(MY_BMP *bmp1, MY_BMP *bmp2, PIXEL_POS difference_arr[], size_t difference_arr_max_length) {
     assert(bmp1 != NULL);
@@ -35,9 +35,8 @@ int compare_my_bmp(MY_BMP *bmp1, MY_BMP *bmp2, PIXEL_POS difference_arr[], size_
 }
 
 int main(int argc, char *argv[]) {
-    argc--, argv++; // ignore the name of the program
     if (argc != COMPARER_REQUIRED_ARG_COUNT) {
-        log_error("Invalid number of command line arguments. Expected %d arg(s), but found %d arg(s)\n", COMPARER_REQUIRED_ARG_COUNT, argc);
+        log_error("Invalid number of command line arguments. Expected %d arg(s), but found %d arg(s)\n", COMPARER_REQUIRED_ARG_COUNT - 1, argc - 1);
         return COMPARER_INVALID_COMMAND_LINE_ARGS_EXIT_CODE;
     }
     MY_BMP bmp1, bmp2;
